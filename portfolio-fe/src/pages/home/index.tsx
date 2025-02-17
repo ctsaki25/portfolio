@@ -2,9 +2,9 @@ import { useEffect, useState, useCallback } from "react";
 import { Project } from "@/models/Project";
 import { useProjectService } from "@/services/projectService";
 import { useTranslation } from "react-i18next";
-import styles from './Home.module.css';
+import styles from './home.module.css';
 
-const BACKEND_URL = 'http://localhost:8080'; // or your actual backend URL
+const BACKEND_URL = 'http://localhost:8080'; 
 
 // Properly type the ProjectCard component
 const ProjectCard = ({ project }: { project: Project }) => {
