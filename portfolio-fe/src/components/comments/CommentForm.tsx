@@ -3,9 +3,16 @@ import { useAuthenticatedFetch } from "../../hooks/useAuthenticatedFetch";
 import { useState } from "react";
 import { Button, Textarea, Stack } from "@mantine/core";
 
+interface Comment {
+  id: string;
+  content: string;
+  author: string;
+  createdAt: string;
+}
+
 interface CommentFormProps {
   projectId: string;
-  onCommentAdded: (comment: any) => void;
+  onCommentAdded: (comment: Comment) => void;
 }
 
 const CommentForm = ({ projectId, onCommentAdded }: CommentFormProps) => {
@@ -31,7 +38,7 @@ const CommentForm = ({ projectId, onCommentAdded }: CommentFormProps) => {
           },
           body: JSON.stringify({ content }),
         }
-      );
+      ) as Comment;
 
       onCommentAdded(response);
       setContent("");

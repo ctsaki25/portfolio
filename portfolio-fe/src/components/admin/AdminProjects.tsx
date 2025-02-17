@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Project } from '@/models/Project';
 import { useProjectService } from '@/services/projectService';
 import './AdminProjects.css';
@@ -82,7 +82,7 @@ const AdminProjects = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       setLoading(true);
       const response = await projectService.getAdminProjects();
@@ -94,11 +94,11 @@ const AdminProjects = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [projectService]);
 
   useEffect(() => {
     fetchProjects();
-  }, []);
+  }, [fetchProjects]);
 
   if (isLoading) {
     return <div>Loading...</div>;

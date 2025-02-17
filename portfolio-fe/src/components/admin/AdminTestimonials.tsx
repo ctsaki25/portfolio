@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Testimonial } from '../../types/testimonial';
 import { useTestimonialService } from '../../services/testimonialService';
 import './AdminTestimonials.css';
@@ -11,23 +11,22 @@ const AdminTestimonials = () => {
   const testimonialService = useTestimonialService();
   const { t } = useTranslation();
 
-  useEffect(() => {
-    fetchTestimonials();
-  }, []);
-
-  const fetchTestimonials = async () => {
+  const fetchTestimonials = useCallback(async () => {
     try {
       setLoading(true);
       const data = await testimonialService.getAllTestimonials();
       setTestimonials(data);
       setError(null);
-    } catch (err) {
+    } catch {
       setError('Failed to fetch testimonials');
-      console.error(err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [testimonialService]);
+
+  useEffect(() => {
+    fetchTestimonials();
+  }, [fetchTestimonials]);
 
   const handleApprove = async (id: string) => {
     try {

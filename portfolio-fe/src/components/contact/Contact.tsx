@@ -1,6 +1,6 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import { useState, ChangeEvent, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './Contact.module.css';
+import styles from './contact.module.css';
 
 interface FormData {
   name: string;

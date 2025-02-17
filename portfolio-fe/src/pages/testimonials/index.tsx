@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Testimonial as TestimonialModel, TestimonialRequest } from '@/types/testimonial';
 import { useTestimonialService } from '@/services/testimonialService';
@@ -77,11 +77,7 @@ const Testimonials = () => {
     const { isAuthenticated, user } = useAuth0();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        fetchTestimonials();
-    }, []);
-
-    const fetchTestimonials = async () => {
+    const fetchTestimonials = useCallback(async () => {
         try {
             console.log('Fetching testimonials...');
             const data = await testimonialService.getPublishedTestimonials();
@@ -96,7 +92,11 @@ const Testimonials = () => {
             setError('Failed to load testimonials');
             setLoading(false);
         }
-    };
+    }, [testimonialService]);
+
+    useEffect(() => {
+        fetchTestimonials();
+    }, [fetchTestimonials]);
 
     const handleSubmitTestimonial = async (testimonial: { name: string, title: string, content: string, stars: number }) => {
         try {
