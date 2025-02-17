@@ -1,0 +1,104 @@
+.adminContainer {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.error {
+    text-align: center;
+    padding: 1rem;
+    margin: 1rem 0;
+    background-color: #fee2e2;
+    color: #dc2626;
+    border-radius: 0.5rem;
+}
+
+.projectsSection,
+.commentsSection {
+    margin-bottom: 3rem;
+}
+
+.projectsSection h2,
+.commentsSection h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.projectsList,
+.commentsList {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.projectItem,
+.commentItem {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.projectInfo h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.projectControls,
+.commentControls {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.publishButton,
+.unpublishButton,
+.approveButton,
+.rejectButton {
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.publishButton,
+.approveButton {
+    background-color: #059669;
+    color: white;
+}
+
+.unpublishButton,
+.rejectButton {
+    background-color: #dc2626;
+    color: white;
+}
+
+.publishButton:hover,
+.approveButton:hover {
+    background-color: #047857;
+}
+
+.unpublishButton:hover,
+.rejectButton:hover {
+    background-color: #b91c1c;
+}
+
+.commentHeader {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.commentContent p {
+    color: #4b5563;
+    line-height: 1.5;
+}

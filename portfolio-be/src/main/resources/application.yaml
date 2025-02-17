@@ -1,0 +1,71 @@
+server:
+  port: ${BACKEND_PORT}
+  error:
+    include-message: always
+
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    com.portfolio: DEBUG
+    de.flapdoodle.embed.mongo: INFO
+
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 8.0.0
+
+portfolio:
+  frontend:
+    url: ${FRONTEND_URL}
+
+#spring:
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: ${OKTA_ISSUER}
+#          jwk-set-uri: ${OKTA_ISSUER}.well-known/jwks.json
+#      client:
+#        registration:
+#          okta:
+#            client-id: ${OKTA_CLIENT_ID}
+#            client-secret: ${OKTA_CLIENT_SECRET}
+#            client-authentication-method: client_secret_basic
+#            authorization-grant-type: authorization_code
+#            scope: openid,profile,email
+#        provider:
+#          okta:
+#            issuer-uri: ${OKTA_ISSUER}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: docker
+  autoconfigure:
+    exclude: de.flapdoodle.embed.mongo.spring.autoconfigure.EmbeddedMongoAutoConfiguration
+  data:
+    mongodb:
+      host: mongo
+      port: ${MONGO_PORT}
+      database: ${MONGO_DATABASE}
+      username: ${MONGO_ROOT_USER}
+      password: ${MONGO_ROOT_PASS}
+      authentication-database: admin
+  security:
+    oauth2:
+      client:
+        registration:
+          auth0:
+            client-id: ${AUTH0_CLIENT_ID}
+            client-secret: ${AUTH0_CLIENT_SECRET}
+            scope:
+              - openid
+              - profile
+              - email
+        provider:
+          auth0:
+            issuer-uri: https://${AUTH0_DOMAIN}/

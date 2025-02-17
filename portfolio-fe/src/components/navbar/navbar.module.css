@@ -1,0 +1,149 @@
+.nav {
+  background-color: white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.navContainer {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .navContainer {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .navContainer {
+    padding: 0 2rem;
+  }
+}
+
+.navContent {
+  display: flex;
+  justify-content: space-between;
+  height: 4rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: rgb(31, 41, 55);
+}
+
+.desktopNav {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .desktopNav {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+}
+
+.navLink {
+  color: rgb(75, 85, 99);
+  transition: color 0.2s;
+}
+
+.navLink:hover {
+  color: rgb(17, 24, 39);
+}
+
+.cvButton {
+  padding: 0.5rem 1rem;
+  background-color: rgb(37, 99, 235);
+  color: white;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.cvButton:hover {
+  background-color: rgb(29, 78, 216);
+}
+
+.mobileMenuButton {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  color: rgb(75, 85, 99);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .mobileMenuButton {
+    display: none;
+  }
+}
+
+.mobileMenu {
+  padding: 0.5rem;
+}
+
+.mobileMenuItem {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem;
+  color: rgb(75, 85, 99);
+  transition: color 0.2s;
+}
+
+.mobileMenuItem:hover {
+  color: rgb(17, 24, 39);
+}
+
+.authContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  border: 2px solid var(--mantine-color-gray-3);
+}
+
+.loginButton, .logoutButton {
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.loginButton {
+  background-color: var(--mantine-color-blue-6);
+  color: white;
+}
+
+.logoutButton {
+  background-color: var(--mantine-color-red-6);
+  color: white;
+}
+
+.loginButton:hover {
+  background-color: var(--mantine-color-blue-7);
+}
+
+.logoutButton:hover {
+  background-color: var(--mantine-color-red-7);
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+}

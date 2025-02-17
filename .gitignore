@@ -1,0 +1,6 @@
+data/
+.portfolio-fe
+.env*
+.idea
+.DS_Store
+env

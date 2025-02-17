@@ -1,0 +1,16 @@
+html {
+  background-image: url("./assets/cloud-pattern.jpg");
+  background-size: cover;
+  background-repeat: repeat-y;
+  background-attachment: fixed;
+  background-position: center;
+}
+
+body {
+  background-color: transparent !important;
+}
+
+#root {
+  width: 95vw;
+  margin: 0 auto;
+}
