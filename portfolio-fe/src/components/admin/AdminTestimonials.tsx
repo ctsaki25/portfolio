@@ -63,7 +63,7 @@ const AdminTestimonials = () => {
       <button>{t('Add Testimonial')}</button>
       <div className="testimonials-list">
         {testimonials.map(testimonial => (
-          <div key={testimonial._id} className="testimonial-card">
+          <div key={testimonial.testimonialId} className="testimonial-card">
             <div className="testimonial-content">
               <p>{testimonial.content}</p>
               <div className="testimonial-author">
@@ -71,21 +71,21 @@ const AdminTestimonials = () => {
                 <span>{testimonial.role} at {testimonial.company}</span>
               </div>
               <div className="testimonial-status">
-                Status: {testimonial.isApproved ? 'Approved' : 'Pending'}
+                Status: {testimonial.published ? 'Approved' : 'Pending'}
               </div>
             </div>
             <div className="testimonial-actions">
-              {!testimonial.isApproved && (
+              {!testimonial.published && (
                 <>
                   <button
                     className="approve-btn"
-                    onClick={() => handleApprove(testimonial._id)}
+                    onClick={() => handleApprove(testimonial.testimonialId)}
                   >
                     Approve
                   </button>
                   <button
                     className="discard-btn"
-                    onClick={() => handleDiscard(testimonial._id)}
+                    onClick={() => handleDiscard(testimonial.testimonialId)}
                   >
                     Discard
                   </button>

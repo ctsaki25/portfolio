@@ -42,7 +42,7 @@ const CommentForm = ({ projectId, onCommentAdded }: CommentFormProps) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack spacing="md">
+      <Stack gap="md">
         <Textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}

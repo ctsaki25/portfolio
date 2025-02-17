@@ -5,7 +5,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 
 export const useProjectService = () => {
     const axiosInstance = useAxiosInstance();
-    const { getAccessToken } = useAuth0();
+    const { getAccessTokenSilently: getAccessToken } = useAuth0();
 
     const uploadProjectImage = async (file: File): Promise<string> => {
         const formData = new FormData();
@@ -25,17 +25,13 @@ export const useProjectService = () => {
     };
 
     const getAdminProjects = async (): Promise<Project[]> => {
-        try {
-            const token = await getAccessToken();
-            const response = await axiosInstance.get("/projects/admin", {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
+        const token = await getAccessToken();
+        const response = await axiosInstance.get("/projects/admin", {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response.data;
     };
 
     const getPublishedProjects = async (): Promise<Project[]> => {

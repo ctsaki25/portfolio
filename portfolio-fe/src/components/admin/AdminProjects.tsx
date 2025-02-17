@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Project } from '@/models/Project';
 import { useProjectService } from '@/services/projectService';
 import './AdminProjects.css';
@@ -82,18 +82,10 @@ const AdminProjects = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/" />;
-  }
-
   const fetchProjects = async () => {
     try {
       setLoading(true);
-      const response = await projectService.getAllProjects();
+      const response = await projectService.getAdminProjects();
       setProjects(response);
       setError("");
     } catch (error) {
@@ -103,6 +95,18 @@ const AdminProjects = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/" />;
+  }
 
   const handlePublishToggle = async (projectId: string, currentStatus: boolean) => {
     try {
@@ -149,10 +153,6 @@ const AdminProjects = () => {
       return false;
     }
   };
-
-  useEffect(() => {
-    fetchProjects();
-  }, []);
 
   if (loading) return <div className="loading">Loading projects...</div>;
   if (error) return <div className="error">{error}</div>;

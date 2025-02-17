@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Testimonial } from '@/models/Testimonial';
+import { Testimonial as TestimonialModel, TestimonialRequest } from '@/types/testimonial';
 import { useTestimonialService } from '@/services/testimonialService';
 import styles from './Testimonials.module.css';
 import { useAuth0 } from "@auth0/auth0-react";
@@ -68,7 +68,7 @@ const TestimonialForm = ({ onSubmit }: { onSubmit: (testimonial: { name: string,
 
 const Testimonials = () => {
     const { t } = useTranslation();
-    const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+    const [testimonials, setTestimonials] = useState<TestimonialModel[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [showForm, setShowForm] = useState(false);
@@ -100,7 +100,16 @@ const Testimonials = () => {
 
     const handleSubmitTestimonial = async (testimonial: { name: string, title: string, content: string, stars: number }) => {
         try {
-            await testimonialService.createTestimonial(testimonial);
+            const newTestimonial: TestimonialRequest = {
+                name: testimonial.name,
+                title: testimonial.title,
+                content: testimonial.content,
+                stars: testimonial.stars,
+                author: testimonial.name,
+                role: testimonial.title,
+                company: ''
+            };
+            await testimonialService.createTestimonial(newTestimonial);
             setShowForm(false);
             // Show success message
             alert(t("Thank you for your testimonial! It will be reviewed by an administrator."));
