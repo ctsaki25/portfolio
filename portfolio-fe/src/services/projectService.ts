@@ -21,75 +21,48 @@ export const useProjectService = () => {
     };
 
     const getAdminProjects = async (): Promise<Project[]> => {
-        try {
-            const response = await axiosInstance.get('/projects/admin');
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching admin projects:', error);
-            throw error;
-        }
+        const response = await axiosInstance.get("/projects/admin");
+        return response.data;
     };
 
     const getPublishedProjects = async (): Promise<Project[]> => {
-        try {
-            const response = await axiosInstance.get('/projects/published');
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching published projects:', error);
-            throw error;
-        }
+        const response = await axiosInstance.get("/projects/published");
+        return response.data;
     };
 
-    const createProject = async (project: Project, imageFile?: File): Promise<AxiosResponse> => {
-        try {
-            const formData = new FormData();
-            formData.append('project', new Blob([JSON.stringify(project)], { type: 'application/json' }));
-            if (imageFile) {
-                formData.append('image', imageFile);
-            }
-
-            const response = await axiosInstance.post('/projects', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-
-            return response;
-        } catch (error) {
-            console.error('Error creating project:', error);
-            throw error;
+    const createProject = async (project: Project, imageFile?: File): Promise<AxiosResponse<Project>> => {
+        const projectData = { ...project };
+        
+        if (imageFile) {
+            const imageUrl = await uploadProjectImage(imageFile);
+            projectData.imageUrl = imageUrl;
         }
+        
+        return await axiosInstance.post<Project>("/projects", projectData);
     };
 
-    const updateProject = async (projectId: string, project: Project, imageFile?: File): Promise<Project> => {
-        try {
-            const formData = new FormData();
-            formData.append('project', new Blob([JSON.stringify(project)], { type: 'application/json' }));
-            if (imageFile) {
-                formData.append('image', imageFile);
-            }
-
-            const response = await axiosInstance.put(`/projects/${projectId}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-
-            return response.data;
-        } catch (error) {
-            console.error('Error updating project:', error);
-            throw error;
+    const updateProject = async (
+        projectId: string,
+        project: Project,
+        imageFile?: File
+    ): Promise<Project> => {
+        const projectData = { ...project };
+        
+        if (imageFile) {
+            const imageUrl = await uploadProjectImage(imageFile);
+            projectData.imageUrl = imageUrl;
         }
+        
+        const response = await axiosInstance.put<Project>(
+            `/projects/${projectId}`,
+            projectData
+        );
+        return response.data;
     };
 
     const updateProjectStatus = async (projectId: string, published: boolean): Promise<Project> => {
-        try {
-            const response = await axiosInstance.patch(`/projects/${projectId}/status`, { published });
-            return response.data;
-        } catch (error) {
-            console.error('Error updating project status:', error);
-            throw error;
-        }
+        const response = await axiosInstance.patch<Project>(`/projects/${projectId}/publish`, { published });
+        return response.data;
     };
 
     const getProjectById = async (projectId: string): Promise<Project> => {
@@ -98,12 +71,7 @@ export const useProjectService = () => {
     };
 
     const deleteProject = async (projectId: string): Promise<void> => {
-        try {
-            await axiosInstance.delete(`/projects/${projectId}`);
-        } catch (error) {
-            console.error('Error deleting project:', error);
-            throw error;
-        }
+        await axiosInstance.delete(`/projects/${projectId}`);
     };
 
     return {
