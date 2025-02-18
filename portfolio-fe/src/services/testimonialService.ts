@@ -1,4 +1,4 @@
-import { useAxiosInstance } from "../utils/axiosInstance";
+import axiosInstance from "../utils/axiosInstance";
 import { Testimonial } from "@/types/testimonial";
 
 export interface TestimonialRequest {
@@ -9,8 +9,6 @@ export interface TestimonialRequest {
 }
 
 export const useTestimonialService = () => {
-    const axiosInstance = useAxiosInstance();
-
     const getAllTestimonials = async (): Promise<Testimonial[]> => {
         const response = await axiosInstance.get("/testimonials/all");
         return response.data;
