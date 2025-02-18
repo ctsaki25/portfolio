@@ -9,7 +9,6 @@
 # Production
 /build
 /dist
-docker-compose.prod.yml
 .env.prod
 .env.production
 .env.local
