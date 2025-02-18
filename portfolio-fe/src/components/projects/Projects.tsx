@@ -6,9 +6,10 @@ import './Projects.css';
 import '@/styles/hero.css';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
+import { API_URL } from '../../config/api';
 
-// Add this constant at the top of the file
-const BACKEND_URL = 'http://localhost:8080';
+// Replace the BACKEND_URL constant with:
+const BACKEND_URL = API_URL;
 
 // Create a custom hook to manage project data and fetching
 const useProjects = () => {

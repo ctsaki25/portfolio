@@ -1,6 +1,7 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './contact.module.css';
+import { API_URL_V1 } from '../../config/api';
 
 interface FormData {
   name: string;
@@ -34,7 +35,7 @@ const Contact = () => {
     setSubmitStatus('');
 
     try {
-      const response = await fetch('http://localhost:8080/api/v1/email/send', {
+      const response = await fetch(`${API_URL_V1}/email/send`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

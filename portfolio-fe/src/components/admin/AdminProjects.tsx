@@ -4,8 +4,9 @@ import { useProjectService } from '@/services/projectService';
 import './AdminProjects.css';
 import ProjectFormModal from './ProjectFormModal';
 import { Link } from 'react-router-dom';
+import { API_URL } from '../../config/api';
 
-const BACKEND_URL = 'http://localhost:8080';
+const BACKEND_URL = API_URL;
 
 const ProjectCard = ({ project, onPublishToggle, onDelete, onEdit }: {
   project: Project;

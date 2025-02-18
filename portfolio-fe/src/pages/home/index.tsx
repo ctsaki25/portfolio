@@ -3,8 +3,9 @@ import { Project } from "@/models/Project";
 import { useProjectService } from "@/services/projectService";
 import { useTranslation } from "react-i18next";
 import styles from './home.module.css';
+import { API_URL } from '../../config/api';
 
-const BACKEND_URL = 'http://localhost:8080'; 
+const BACKEND_URL = API_URL; 
 
 // Properly type the ProjectCard component
 const ProjectCard = ({ project }: { project: Project }) => {

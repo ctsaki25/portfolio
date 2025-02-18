@@ -7,8 +7,12 @@ services:
     build:
       context: ./portfolio-fe
       dockerfile: Dockerfile.prod
+      args:
+        - VITE_API_URL=${VITE_API_URL}
     ports:
       - "80:80"
+    environment:
+      - VITE_API_URL=${VITE_API_URL}
     env_file:
       - .env.prod
     depends_on:
@@ -23,13 +27,20 @@ services:
       dockerfile: Dockerfile
     environment:
       - SPRING_PROFILES_ACTIVE=prod
+      - spring.mail.username=${EMAIL_USERNAME}
+      - spring.mail.password=${EMAIL_PASSWORD}
+      - SPRING_DATA_MONGODB_URI=mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASS}@mongo:27017/portfolio?authSource=admin
+      - file.upload-dir=/app/uploads
+      - app.base-url=http://157.230.70.214
+    volumes:
+      - ./uploads:/app/uploads
+    env_file:
+      - .env.prod
     depends_on:
       mongo:
         condition: service_healthy
     ports:
-      - "8080:8080"
-    env_file:
-      - .env.prod
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
     restart: always
 
   mongo:
@@ -37,17 +48,18 @@ services:
     container_name: mongo
     restart: always
     ports:
-      - "27017:27017"
+      - "${MONGO_PORT}:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASS}
     volumes:
       - mongodb_data:/data/db
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASS}@localhost:27017/ --quiet
-      interval: 30s
+      test: mongosh --eval 'db.runCommand("ping").ok' --quiet
+      interval: 10s
       timeout: 10s
       retries: 5
+      start_period: 40s
 
 volumes:
   mongodb_data: 

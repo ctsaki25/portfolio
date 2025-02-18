@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import axios, { AxiosError } from 'axios';
+import { API_URL } from '../config/api';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -17,7 +18,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (username: string, password: string) => {
     try {
       console.log('Attempting login...');
-      const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+      const baseURL = API_URL;
       console.log('Using base URL:', baseURL);
 
       const response = await axios.post(`${baseURL}/api/v1/auth/login`, {
