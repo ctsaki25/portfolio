@@ -10,11 +10,51 @@ logging:
     com.portfolio: DEBUG
     de.flapdoodle.embed.mongo: INFO
 
+jwt:
+  secret: ${JWT_SECRET:b3976f61e72ffb62efd71c428ad7ecea1669b96c64cad61859b94d5cfa4a8d5f}
+  validity: 86400000  # 24 hours in milliseconds
+
+admin:
+  username: ${ADMIN_USERNAME:tonynearos444}
+  password: ${ADMIN_PASSWORD:d3nbl3k0m3b@t$0us}
+
+spring:
+  data:
+    mongodb:
+      database: portfolio
+      auto-index-creation: true
+      connection-pool:
+        max-size: 100
+        min-size: 5
+        max-wait-time: 2000
+        max-connection-life-time: 30000
+  mongodb:
+    embedded:
+      version: 8.0.0
+      storage:
+        oplog-size: 10
+        repl-set-name: rs0
+        database-dir: ./data/mongodb
+      daemon: true
+      features:
+        disable-in-memory: false
+        only-with-ssl: false
+      args:
+        - --storageEngine=wiredTiger
+        - --wiredTigerCacheSizeGB=0.25
+        - --wiredTigerJournalCompressor=snappy
+        - --setParameter=maxTransactionLockRequestTimeoutMillis=1000
+        - --setParameter=transactionLifetimeLimitSeconds=60
+
 de:
   flapdoodle:
     mongodb:
       embedded:
         version: 8.0.0
+        storage:
+          database-dir: ./data/mongodb
+          oplog-size: 50
+          repl-set-name: rs0
 
 portfolio:
   frontend:

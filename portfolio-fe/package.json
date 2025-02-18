@@ -14,7 +14,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@auth0/auth0-react": "^2.3.0",
     "@date-io/dayjs": "^3.0.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
@@ -37,7 +36,6 @@
     "@tiptap/pm": "^2.10.3",
     "@tiptap/react": "^2.10.3",
     "@tiptap/starter-kit": "^2.10.3",
-    "@types/auth0": "^3.3.10",
     "@types/node": "^22.10.1",
     "axios": "^1.7.9",
     "dayjs": "^1.11.13",

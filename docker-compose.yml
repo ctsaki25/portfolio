@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   frontend:
     image: portfolio-fe
@@ -8,20 +6,18 @@ services:
       context: ./portfolio-fe
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "5173:5173"
     env_file:
       - .env
     volumes:
       - ./portfolio-fe/src:/app/src
       - ./portfolio-fe/data:/app/data
-    depends_on:
-      - backend
   backend:
     image: portfolio-be
     container_name: portfolio-be
     build: portfolio-be
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       mongo:
         condition: service_healthy
@@ -38,10 +34,8 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASS}
-    volumes:
-      - mongodb_data:/data/db
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongosh mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASS}@localhost:27017/ --quiet
+      test: echo 'db.runCommand("ping").ok' | mongosh mongodb://${MONGO_ROOT_USER}:${MONGO_ROOT_PASS}@localhost:${MONGO_PORT}/ --quiet
       interval: 30s
       timeout: 10s
       retries: 5
@@ -58,6 +52,3 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
-
-volumes:
-  mongodb_data:

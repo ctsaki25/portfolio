@@ -1,12 +1,11 @@
 import { useAxiosInstance } from "../utils/axiosInstance";
-import { Testimonial } from "../types/testimonial";
-import { AxiosResponse } from "axios";
+import { Testimonial } from "@/types/testimonial";
 
-interface TestimonialRequest {
-    author: string;
+export interface TestimonialRequest {
+    name: string;
+    title: string;
     content: string;
-    role: string;
-    company: string;
+    stars: number;
 }
 
 export const useTestimonialService = () => {
@@ -22,14 +21,18 @@ export const useTestimonialService = () => {
         return response.data;
     };
 
-    const createTestimonial = async (testimonial: TestimonialRequest): Promise<AxiosResponse<Testimonial>> => {
-        return await axiosInstance.post<Testimonial>("/testimonials", testimonial);
+    const createTestimonial = async (testimonial: TestimonialRequest): Promise<Testimonial> => {
+        const response = await axiosInstance.post("/testimonials", testimonial);
+        return response.data;
     };
 
-    const updateTestimonialStatus = async (testimonialId: string, approved: boolean): Promise<Testimonial> => {
-        const response = await axiosInstance.put<Testimonial>(
-            `/testimonials/${testimonialId}/${approved ? 'approve' : 'reject'}`
-        );
+    const approveTestimonial = async (testimonialId: string): Promise<Testimonial> => {
+        const response = await axiosInstance.put(`/testimonials/${testimonialId}/approve`);
+        return response.data;
+    };
+
+    const rejectTestimonial = async (testimonialId: string): Promise<Testimonial> => {
+        const response = await axiosInstance.put(`/testimonials/${testimonialId}/reject`);
         return response.data;
     };
 
@@ -37,6 +40,7 @@ export const useTestimonialService = () => {
         getAllTestimonials,
         getPublishedTestimonials,
         createTestimonial,
-        updateTestimonialStatus
+        approveTestimonial,
+        rejectTestimonial
     };
 }; 

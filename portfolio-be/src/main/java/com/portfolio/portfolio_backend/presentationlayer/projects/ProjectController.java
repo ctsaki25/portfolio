@@ -17,6 +17,8 @@ import reactor.core.publisher.Mono;
 import org.springframework.security.core.Authentication;
 
 import java.util.Map;
+import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 @Slf4j
 @RestController
@@ -59,7 +61,18 @@ public class ProjectController {
     @GetMapping("/admin")
     public Flux<ProjectResponseModel> getAllProjects() {
         log.info("Received request to get all projects (admin)");
-        return projectService.getAllProjects();
+        return projectService.getAllProjects()
+            .timeout(Duration.ofSeconds(10))
+            .onErrorResume(TimeoutException.class, e -> {
+                log.error("Timeout while retrieving projects: {}", e.getMessage());
+                return Flux.error(new RuntimeException("Request timed out. Please try again."));
+            })
+            .onErrorResume(Exception.class, e -> {
+                log.error("Error retrieving projects: {}", e.getMessage());
+                return Flux.error(new RuntimeException("Failed to retrieve projects. Please try again."));
+            })
+            .doOnComplete(() -> log.info("Successfully retrieved all projects"))
+            .doOnError(error -> log.error("Error retrieving projects: {}", error.getMessage()));
     }
 
     @GetMapping("/{projectId}")

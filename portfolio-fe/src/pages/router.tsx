@@ -1,17 +1,42 @@
-import { Route, Routes } from "react-router";
-import { routerType } from "../types/router.types";
-import pagesData from "./pagesData";
-import { NotFound } from "./errors/notfound";
+import { Routes, Route } from 'react-router-dom';
+import ProtectedRoute from '../components/auth/ProtectedRoute';
+import Login from '../components/auth/Login';
+import AdminProjects from '../components/admin/AdminProjects';
+import AdminTestimonials from '../components/admin/AdminTestimonials';
+import Home from '../pages/home';
+import Projects from '../components/projects/Projects';
+import Testimonials from '../pages/testimonials';
+import Skills from './skills';
+import Contact from '@/components/contact/Contact';
 
 const Router = () => {
-  const pageRoutes = pagesData.map(({ path, title, element }: routerType) => {
-    return <Route key={title} path={`/${path}`} element={element} />;
-  });
-
   return (
     <Routes>
-      <Route path="*" element={<NotFound />} />
-      {pageRoutes}
+      {/* Public routes */}
+      <Route path="/" element={<Home />} />
+      <Route path="/projects" element={<Projects />} />
+      <Route path="/testimonials" element={<Testimonials />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/skills" element={<Skills />} />
+      <Route path="/contact" element={<Contact />} />
+
+      {/* Protected routes */}
+      <Route
+        path="/admin/projects"
+        element={
+          <ProtectedRoute>
+            <AdminProjects />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/testimonials"
+        element={
+          <ProtectedRoute>
+            <AdminTestimonials />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 };

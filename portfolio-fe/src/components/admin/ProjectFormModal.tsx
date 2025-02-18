@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { Project } from '@/models/Project';
-import { useProjectService } from '@/services/projectService';
 import './ProjectFormModal.css';
 
 interface ProjectFormModalProps {
   project?: Project;
   onClose: () => void;
-  onSubmit: (project: Project) => void;
+  onSubmit: (project: Project, imageFile?: File) => void;
 }
 
 const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ project, onClose, onSubmit }) => {
@@ -24,11 +23,10 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ project, onClose, o
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>(project?.imageUrl || '');
 
-  const { createProject, updateProject } = useProjectService();
-
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         if (e.target?.result) {
@@ -69,16 +67,7 @@ const ProjectFormModal: React.FC<ProjectFormModalProps> = ({ project, onClose, o
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      if (project?.projectId) {
-        await updateProject(project.projectId, formData, imageFile || undefined);
-      } else {
-        await createProject(formData, imageFile || undefined);
-      }
-      onSubmit(formData);
-    } catch (error) {
-      console.error('Error saving project:', error);
-    }
+    onSubmit(formData, imageFile || undefined);
   };
 
   return (

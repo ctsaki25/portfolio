@@ -1,23 +1,18 @@
 import { useState } from 'react';
 import classes from './navbar.module.css';
-import { useAuth0 } from "@auth0/auth0-react";
-import { Avatar } from "@mantine/core";
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../contexts/AuthContext';
+import { Link } from 'react-router-dom';
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState('EN');
-  const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0();
   const { t } = useTranslation();
-
-  const toggleLanguage = () => {
-    setCurrentLanguage(currentLanguage === 'EN' ? 'FR' : 'EN');
-  };
+  const { isAuthenticated, logout } = useAuth();
 
   const handleDownloadCV = () => {
     const link = document.createElement('a');
-    link.href = '/CV_Tsakiris.pdf'; // CV should be placed in the public folder
-    link.download = 'Tsakiris_CV.pdf'; // Change this to your preferred filename
+    link.href = '/CV_Tsakiris.pdf';
+    link.download = 'Tsakiris_CV.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -34,8 +29,8 @@ function Navbar() {
 
           {/* Desktop Navigation */}
           <div className={classes.desktopNav}>
-            <button onClick={toggleLanguage} className={classes.navLink}>
-              {currentLanguage}
+            <button className={classes.cvButton} onClick={handleDownloadCV}>
+              CV
             </button>
             <a href="/projects" className={classes.navLink}>
               {t('Projects')}
@@ -49,32 +44,14 @@ function Navbar() {
             <a href="/contact" className={classes.navLink}>
               {t('Contact')}
             </a>
-            <button className={classes.cvButton} onClick={handleDownloadCV}>
-              CV
-            </button>
             {isAuthenticated ? (
-              <div className={classes.authContainer}>
-                <Avatar 
-                  src={user?.picture} 
-                  alt={user?.name || ""} 
-                  radius="xl"
-                  size="sm"
-                  className={classes.avatar}
-                />
-                <button
-                  onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
-                  className={`${classes.navLink} ${classes.logoutButton}`}
-                >
-                  {t('Log Out')}
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={() => loginWithRedirect()}
-                className={`${classes.navLink} ${classes.loginButton}`}
-              >
-                {t('Log In')}
+              <button onClick={logout} className={classes.navLink}>
+                {t('Logout')}
               </button>
+            ) : (
+              <Link to="/login" className={classes.navLink}>
+                {t('Login')}
+              </Link>
             )}
           </div>
 
@@ -105,34 +82,14 @@ function Navbar() {
             <button className={classes.mobileMenuItem} onClick={handleDownloadCV}>
               CV
             </button>
-            <button onClick={toggleLanguage} className={classes.mobileMenuItem}>
-              {currentLanguage}
-            </button>
             {isAuthenticated ? (
-              <>
-                <div className={`${classes.mobileMenuItem} ${classes.userInfo}`}>
-                  <Avatar 
-                    src={user?.picture} 
-                    alt={user?.name || ""} 
-                    radius="xl"
-                    size="sm"
-                  />
-                  <span>{user?.name}</span>
-                </div>
-                <button
-                  onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}
-                  className={classes.mobileMenuItem}
-                >
-                  {t('Log Out')}
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => loginWithRedirect()}
-                className={classes.mobileMenuItem}
-              >
-                {t('Log In')}
+              <button onClick={logout} className={classes.mobileMenuItem}>
+                {t('Logout')}
               </button>
+            ) : (
+              <Link to="/login" className={classes.mobileMenuItem}>
+                {t('Login')}
+              </Link>
             )}
           </div>
         )}

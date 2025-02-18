@@ -16,9 +16,9 @@ const Skills = () => {
       category: t("Certificates"),
       icon: <Award size={24} />,
       items: [
-        t("AWS Certified Cloud Practitioner"),
-        t("Oracle Certified Associate, Java SE 8 Programmer"),
-        t("Microsoft Azure Fundamentals AZ-900")
+        t("AI Launch Lab Accelerator Program"),
+        t("Cybersecurity Bootcamp"),
+        t("CompTIA Security+")
       ]
     },
     {
@@ -30,7 +30,12 @@ const Skills = () => {
         "JavaScript",
         "Python",
         "SQL",
-        "HTML/CSS"
+        "HTML/CSS",
+        "C#",
+        "C++",
+        "PHP",
+        "Swift",
+        "Kotlin"
       ]
     },
     {

@@ -4,10 +4,9 @@ export interface Testimonial {
   title: string;
   content: string;
   stars: number;
-  author: string;
-  role: string;
-  company: string;
-  published: boolean;
+  approved: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface TestimonialRequest {

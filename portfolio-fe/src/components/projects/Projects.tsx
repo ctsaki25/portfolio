@@ -1,10 +1,11 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Project } from "@/models/Project";
 import { useProjectService } from "@/services/projectService";
 import { Link } from 'react-router-dom';
 import './Projects.css';
-import { useAuth0 } from "@auth0/auth0-react";
+import '@/styles/hero.css';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Add this constant at the top of the file
 const BACKEND_URL = 'http://localhost:8080';
@@ -14,47 +15,45 @@ const useProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
-  const [lastFetchTime, setLastFetchTime] = useState<number>(0);
   const projectService = useProjectService();
-  const { t } = useTranslation();
+  const isFirstLoad = useRef(true);
 
-  // Memoize the fetch function to prevent unnecessary recreations
-  const fetchProjects = useCallback(async (force: boolean = false) => {
-    // Only fetch if forced or if it's been more than 5 minutes since last fetch
-    const now = Date.now();
-    if (!force && lastFetchTime && now - lastFetchTime < 300000) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const response = await projectService.getPublishedProjects();
-      
-      if (Array.isArray(response)) {
-        setProjects(response);
-        setLastFetchTime(now);
-        setError("");
-      } else {
-        setError(t("Failed to load projects: Data format incorrect"));
-      }
-    } catch (error) {
-      console.error(t("Error fetching projects:"), error);
-      setError(t("Failed to fetch projects: {{error}}", { error }));
-    } finally {
-      setLoading(false);
-    }
-  }, [projectService, lastFetchTime, t]);
-
-  // Initial fetch
   useEffect(() => {
+    if (!isFirstLoad.current) return;
+    
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        const response = await projectService.getPublishedProjects();
+        setProjects(response);
+        isFirstLoad.current = false;
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+        setError("Failed to fetch projects");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchProjects();
-  }, [fetchProjects]);
+  }, []); // Empty dependency array
 
   return {
     projects,
     loading,
     error,
-    refreshProjects: () => fetchProjects(true)
+    refreshProjects: async () => {
+      try {
+        setLoading(true);
+        const response = await projectService.getPublishedProjects();
+        setProjects(response);
+      } catch (error) {
+        console.error("Error refreshing projects:", error);
+        setError("Failed to refresh projects");
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 };
 
@@ -95,13 +94,10 @@ const ProjectCard = ({ project }: { project: Project }) => {
 };
 
 const Projects = () => {
-  const { projects, loading, error, refreshProjects } = useProjects();
-  const { isAuthenticated, user } = useAuth0();
+  const { projects, loading, error } = useProjects();
+  const { isAuthenticated } = useAuth();
   const { t } = useTranslation();
   
-  const isAdmin = isAuthenticated && 
-    user?.['https://tsakirisportfolio.ca.auth0.com/roles']?.includes('Admin');
-
   if (loading) return <div className="loading">{t("Loading...")}</div>;
   if (error) return <div className="error">{error}</div>;
 
@@ -111,10 +107,15 @@ const Projects = () => {
       <div className="hero">
         <div className="heroContainer">
           <div className="heroContent">
-            <h1 className="heroTitle">
-              <span>Constantine Tsakiris</span>
-              <span className="heroTitleHighlight">{t("My Projects")}</span>
-            </h1>
+            <div className="heroTextContent">
+              <h1 className="heroTitle">
+                <span>{t('Constantine Tsakiris')}</span>
+                <span className="heroTitleHighlight">{t('Projects')}</span>
+              </h1>
+              <p className="heroDescription">
+                {t('Explore my collection of projects showcasing my expertise in full-stack development, game development, and modern web applications.')}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -131,10 +132,7 @@ const Projects = () => {
           )}
         </div>
         <div className="admin-controls">
-          <button onClick={refreshProjects} className="refresh-button">
-            {t("Refresh Projects")}
-          </button>
-          {isAdmin && (
+          {isAuthenticated && (
             <Link to="/admin/projects" className="admin-button">
               {t("Manage Projects")}
             </Link>

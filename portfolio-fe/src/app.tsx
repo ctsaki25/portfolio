@@ -6,8 +6,8 @@ import { createTheme, MantineProvider } from "@mantine/core";
 import Navbar from "./components/navbar";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Auth0Provider } from "@auth0/auth0-react";
 import LanguageSwitcher from "./components/LanguageSwitcher";
+import { AuthProvider } from './contexts/AuthContext';
 
 const theme = createTheme({
   colors: {
@@ -40,19 +40,9 @@ const theme = createTheme({
 
 function App() {
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <MantineProvider theme={theme}>
-        <Auth0Provider
-          domain="tsakirisportfolio.ca.auth0.com"
-          clientId="qo9QOXlv7SKw8iilG9pkBm0q7M9O8KU0"
-          authorizationParams={{
-            redirect_uri: window.location.origin,
-            audience: "https://tsakirisportfolio.ca.auth0.com/api/v2/",
-            scope: "openid profile email read:roles"
-          }}
-          useRefreshTokens={true}
-          cacheLocation="localstorage"
-        >
+    <AuthProvider>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <MantineProvider theme={theme}>
           <BrowserRouter>
             <LanguageSwitcher />
             <Navbar />
@@ -60,9 +50,9 @@ function App() {
               <Router />
             </div>
           </BrowserRouter>
-        </Auth0Provider>
-      </MantineProvider>
-    </LocalizationProvider>
+        </MantineProvider>
+      </LocalizationProvider>
+    </AuthProvider>
   );
 }
 

@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Project } from '@/models/Project';
 import { useProjectService } from '@/services/projectService';
 import './AdminProjects.css';
 import ProjectFormModal from './ProjectFormModal';
-import { useAuth0 } from "@auth0/auth0-react";
-import { Navigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const BACKEND_URL = 'http://localhost:8080';
 
@@ -74,18 +73,25 @@ const ProjectCard = ({ project, onPublishToggle, onDelete, onEdit }: {
 );
 
 const AdminProjects = () => {
-  const { isAuthenticated, isLoading } = useAuth0();
-  const projectService = useProjectService();
+  const projectServiceRef = useRef(useProjectService());
+  
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  const initialFetchDoneRef = useRef(false);
+  const operationInProgressRef = useRef(false);
 
+  // Memoize fetchProjects to prevent unnecessary recreations
   const fetchProjects = useCallback(async () => {
+    if (operationInProgressRef.current) return;
+    
     try {
+      operationInProgressRef.current = true;
       setLoading(true);
-      const response = await projectService.getAdminProjects();
+      const response = await projectServiceRef.current.getAdminProjects();
       setProjects(response);
       setError("");
     } catch (error) {
@@ -93,68 +99,92 @@ const AdminProjects = () => {
       setError("Failed to fetch projects. Please try again later.");
     } finally {
       setLoading(false);
+      operationInProgressRef.current = false;
     }
-  }, [projectService]);
+  }, []);
 
   useEffect(() => {
-    fetchProjects();
+    if (!initialFetchDoneRef.current) {
+      fetchProjects();
+      initialFetchDoneRef.current = true;
+    }
   }, [fetchProjects]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/" />;
-  }
-
-  const handlePublishToggle = async (projectId: string, currentStatus: boolean) => {
+  const handleCreateProject = async (project: Project, imageFile?: File) => {
+    if (operationInProgressRef.current) return false;
+    
     try {
-      await projectService.updateProjectStatus(projectId, !currentStatus);
-      await fetchProjects();
-    } catch (error) {
-      console.error("Error updating project status:", error);
-      setError("Failed to update project status. Please try again.");
-    }
-  };
-
-  const handleDelete = async (projectId: string) => {
-    if (window.confirm('Are you sure you want to delete this project?')) {
-      try {
-        await projectService.deleteProject(projectId);
-        await fetchProjects();
-      } catch (error) {
-        console.error("Error deleting project:", error);
-        setError("Failed to delete project. Please try again.");
-      }
-    }
-  };
-
-  const handleCreateProject = async (project: Project) => {
-    try {
-      await projectService.createProject(project);
-      await fetchProjects();
+      operationInProgressRef.current = true;
+      const response = await projectServiceRef.current.createProject(project, imageFile);
+      setProjects(prev => [...prev, response.data]);
       return true;
     } catch (error) {
       console.error("Error creating project:", error);
       setError("Failed to create project. Please try again.");
+      fetchProjects();
       return false;
+    } finally {
+      operationInProgressRef.current = false;
     }
   };
 
-  const handleUpdateProject = async (projectId: string, project: Project) => {
+  const handleUpdateProject = async (projectId: string, project: Project, imageFile?: File) => {
+    if (operationInProgressRef.current) return false;
+    
     try {
-      await projectService.updateProject(projectId, project);
-      await fetchProjects();
+      operationInProgressRef.current = true;
+      const updatedProject = await projectServiceRef.current.updateProject(projectId, project, imageFile);
+      setProjects(prev => prev.map(p => p.projectId === projectId ? updatedProject : p));
       return true;
     } catch (error) {
       console.error("Error updating project:", error);
       setError("Failed to update project. Please try again.");
+      fetchProjects();
       return false;
+    } finally {
+      operationInProgressRef.current = false;
     }
   };
 
-  if (loading) return <div className="loading">Loading projects...</div>;
+  const handlePublishToggle = async (projectId: string, currentStatus: boolean) => {
+    if (operationInProgressRef.current) return;
+    
+    try {
+      operationInProgressRef.current = true;
+      const updatedProject = await projectServiceRef.current.updateProjectStatus(projectId, !currentStatus);
+      // Optimistically update the local state
+      setProjects(prev => prev.map(p => p.projectId === projectId ? updatedProject : p));
+    } catch (error) {
+      console.error("Error updating project status:", error);
+      setError("Failed to update project status. Please try again.");
+    } finally {
+      operationInProgressRef.current = false;
+      // Fetch to ensure consistency with backend
+      fetchProjects();
+    }
+  };
+
+  const handleDelete = async (projectId: string) => {
+    if (operationInProgressRef.current) return;
+    
+    if (window.confirm('Are you sure you want to delete this project?')) {
+      try {
+        operationInProgressRef.current = true;
+        await projectServiceRef.current.deleteProject(projectId);
+        // Optimistically update the local state
+        setProjects(prev => prev.filter(p => p.projectId !== projectId));
+      } catch (error) {
+        console.error("Error deleting project:", error);
+        setError("Failed to delete project. Please try again.");
+      } finally {
+        operationInProgressRef.current = false;
+        // Fetch to ensure consistency with backend
+        fetchProjects();
+      }
+    }
+  };
+
+  if (loading && projects.length === 0) return <div className="loading">Loading projects...</div>;
   if (error) return <div className="error">{error}</div>;
 
   return (
@@ -165,17 +195,21 @@ const AdminProjects = () => {
           <button 
             className="refresh-button"
             onClick={fetchProjects}
+            disabled={operationInProgressRef.current}
           >
             Refresh Projects
           </button>
           <button 
             className="add-project-button"
             onClick={() => setShowAddModal(true)}
+            disabled={operationInProgressRef.current}
           >
             Add New Project
           </button>
         </div>
       </div>
+
+      {loading && <div className="loading-overlay">Updating projects...</div>}
 
       <div className="projects-grid">
         {projects.map((project) => (
@@ -189,11 +223,20 @@ const AdminProjects = () => {
         ))}
       </div>
 
+      <div className="back-to-public">
+        <Link to="/projects">Back to Public View</Link>
+      </div>
+
       {showAddModal && (
         <ProjectFormModal
-          onClose={() => setShowAddModal(false)}
-          onSubmit={async (project) => {
-            const success = await handleCreateProject(project);
+          onClose={() => {
+            if (!operationInProgressRef.current) {
+              setShowAddModal(false);
+            }
+          }}
+          onSubmit={async (project, imageFile) => {
+            if (operationInProgressRef.current) return;
+            const success = await handleCreateProject(project, imageFile);
             if (success) setShowAddModal(false);
           }}
         />
@@ -202,9 +245,14 @@ const AdminProjects = () => {
       {editingProject && (
         <ProjectFormModal
           project={editingProject}
-          onClose={() => setEditingProject(null)}
-          onSubmit={async (project) => {
-            const success = await handleUpdateProject(editingProject.projectId!, project);
+          onClose={() => {
+            if (!operationInProgressRef.current) {
+              setEditingProject(null);
+            }
+          }}
+          onSubmit={async (project, imageFile) => {
+            if (operationInProgressRef.current) return;
+            const success = await handleUpdateProject(editingProject.projectId!, project, imageFile);
             if (success) setEditingProject(null);
           }}
         />

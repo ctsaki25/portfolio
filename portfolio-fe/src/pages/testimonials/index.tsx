@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Testimonial as TestimonialModel, TestimonialRequest } from '@/types/testimonial';
 import { useTestimonialService } from '@/services/testimonialService';
 import styles from './Testimonials.module.css';
-import { useAuth0 } from "@auth0/auth0-react";
-import { useNavigate } from "react-router-dom";
+import '@/styles/hero.css';
+import { useAuth } from '@/contexts/AuthContext';
+import { Link } from 'react-router-dom';
 
 const TestimonialForm = ({ onSubmit }: { onSubmit: (testimonial: { name: string, title: string, content: string, stars: number }) => void }) => {
     const { t } = useTranslation();
@@ -66,37 +67,67 @@ const TestimonialForm = ({ onSubmit }: { onSubmit: (testimonial: { name: string,
     );
 };
 
-const Testimonials = () => {
-    const { t } = useTranslation();
+const useTestimonials = () => {
     const [testimonials, setTestimonials] = useState<TestimonialModel[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [showForm, setShowForm] = useState(false);
-    
     const testimonialService = useTestimonialService();
-    const { isAuthenticated, user } = useAuth0();
-    const navigate = useNavigate();
 
     const fetchTestimonials = useCallback(async () => {
         try {
-            console.log('Fetching testimonials...');
-            const data = await testimonialService.getPublishedTestimonials();
-            console.log('Received testimonials:', data);
-            if (!data || data.length === 0) {
-                console.log('No testimonials received from backend');
-            }
-            setTestimonials(data);
-            setLoading(false);
-        } catch (err) {
-            console.error('Error loading testimonials:', err);
-            setError('Failed to load testimonials');
+            setLoading(true);
+            const response = await testimonialService.getPublishedTestimonials();
+            setTestimonials(response);
+            setError('');
+        } catch (error) {
+            console.error("Error fetching testimonials:", error);
+            setError("Failed to fetch testimonials");
+        } finally {
             setLoading(false);
         }
     }, [testimonialService]);
 
+    // Only fetch testimonials once when component mounts
     useEffect(() => {
-        fetchTestimonials();
-    }, [fetchTestimonials]);
+        let mounted = true;
+
+        const loadTestimonials = async () => {
+            try {
+                const response = await testimonialService.getPublishedTestimonials();
+                if (mounted) {
+                    setTestimonials(response);
+                    setError('');
+                }
+            } catch (error) {
+                if (mounted) {
+                    console.error("Error fetching testimonials:", error);
+                    setError("Failed to fetch testimonials");
+                }
+            } finally {
+                if (mounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        loadTestimonials();
+
+        // Cleanup function to prevent state updates if component unmounts
+        return () => {
+            mounted = false;
+        };
+    }, [testimonialService]);
+
+    return { testimonials, loading, error, refreshTestimonials: fetchTestimonials };
+};
+
+const Testimonials = () => {
+    const { t } = useTranslation();
+    const { testimonials, loading, error: fetchError, refreshTestimonials } = useTestimonials();
+    const [showForm, setShowForm] = useState(false);
+    const [submitError, setSubmitError] = useState('');
+    const testimonialService = useTestimonialService();
+    const { isAuthenticated } = useAuth();
 
     const handleSubmitTestimonial = async (testimonial: { name: string, title: string, content: string, stars: number }) => {
         try {
@@ -111,26 +142,16 @@ const Testimonials = () => {
             };
             await testimonialService.createTestimonial(newTestimonial);
             setShowForm(false);
-            // Show success message
             alert(t("Thank you for your testimonial! It will be reviewed by an administrator."));
+            refreshTestimonials();
         } catch (err) {
             console.error('Error submitting testimonial:', err);
-            setError('Failed to submit testimonial');
+            setSubmitError('Failed to submit testimonial');
         }
     };
 
-    const isAdmin = () => {
-        return isAuthenticated && 
-            user && 
-            user['https://tsakirisportfolio.ca.auth0.com/api/v2/']?.includes('admin');
-    };
-
-    const handleAdminClick = () => {
-        navigate('/admin/testimonials');
-    };
-
     if (loading) return <div className={styles.loading}>{t("Loading...")}</div>;
-    if (error) return <div className={styles.error}>{error}</div>;
+    if (fetchError || submitError) return <div className={styles.error}>{fetchError || submitError}</div>;
 
     return (
         <div className={styles.container}>
@@ -140,17 +161,12 @@ const Testimonials = () => {
                     <div className="heroContent">
                         <div className="heroTextContent">
                             <h1 className="heroTitle">
-                                <span>Constantine Tsakiris</span>
-                                <span className="heroTitleHighlight">{t("Client Testimonials")}</span>
+                                <span>{t('Constantine Tsakiris')}</span>
+                                <span className="heroTitleHighlight">{t('Client Testimonials')}</span>
                             </h1>
-                            {isAdmin() && (
-                                <button 
-                                    onClick={handleAdminClick}
-                                    className={styles.adminButton}
-                                >
-                                    {t("Manage Testimonials")}
-                                </button>
-                            )}
+                            <p className="heroDescription">
+                                {t('Read what clients and colleagues have to say about their experiences working with me.')}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -158,12 +174,14 @@ const Testimonials = () => {
 
             {/* Testimonials Section */}
             <div className={styles.testimonialsSection}>
-                <button 
-                    onClick={() => setShowForm(!showForm)} 
-                    className={styles.addButton}
-                >
-                    {showForm ? t("Cancel") : t("Leave a Testimonial")}
-                </button>
+                <div className={styles.controls}>
+                    <button 
+                        onClick={() => setShowForm(!showForm)} 
+                        className={styles.addButton}
+                    >
+                        {showForm ? t("Cancel") : t("Leave a Testimonial")}
+                    </button>
+                </div>
 
                 {showForm && (
                     <TestimonialForm onSubmit={handleSubmitTestimonial} />
@@ -185,6 +203,18 @@ const Testimonials = () => {
                         </div>
                     ))}
                 </div>
+
+                {/* Admin Controls - Moved to bottom */}
+                {isAuthenticated && (
+                    <div className={styles.adminControls}>
+                        <Link 
+                            to="/admin/testimonials" 
+                            className={styles.adminButton}
+                        >
+                            {t("Manage Testimonials")}
+                        </Link>
+                    </div>
+                )}
             </div>
         </div>
     );

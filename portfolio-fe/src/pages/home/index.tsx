@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Project } from "@/models/Project";
 import { useProjectService } from "@/services/projectService";
 import { useTranslation } from "react-i18next";
@@ -56,34 +56,38 @@ const ProjectCard = ({ project }: { project: Project }) => {
   );
 };
 
-const Home = () => {
-  const { t } = useTranslation();
+const useHomeProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const projectService = useProjectService();
+  const isFirstLoad = useRef(true);
 
   const fetchProjects = useCallback(async () => {
+    if (!isFirstLoad.current) return;
     try {
+      setLoading(true);
       const response = await projectService.getPublishedProjects();
-      if (Array.isArray(response)) {
-        setProjects(response);
-      } else {
-        console.error(t("Expected an array of projects, received:"), response);
-        setError(t("Failed to load projects: Data format incorrect"));
-      }
+      setProjects(response);
+      isFirstLoad.current = false;
     } catch (error) {
-      const err = error as Error;
-      console.error(t("Error fetching projects:"), err);
-      setError(t("Failed to fetch projects: {{message}}", { message: err.message }));
+      console.error("Error fetching projects:", error);
+      setError("Failed to fetch projects");
     } finally {
       setLoading(false);
     }
-  }, [projectService, t]);
+  }, [projectService]);
 
   useEffect(() => {
     fetchProjects();
-  }, [fetchProjects]); // Only re-run when fetchProjects changes
+  }, [fetchProjects]);
+
+  return { projects, loading, error };
+};
+
+const Home = () => {
+  const { t } = useTranslation();
+  const { projects, loading, error } = useHomeProjects();
 
   const renderContent = () => {
     if (loading) return <div className={styles.loading}>{t("Loading...")}</div>;

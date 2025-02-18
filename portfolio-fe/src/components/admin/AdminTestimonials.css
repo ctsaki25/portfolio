@@ -1,71 +1,228 @@
 .admin-testimonials {
+  min-height: 100vh;
+  background-color: rgb(249, 250, 251);
+  padding: 2rem 0;
+}
+
+.admin-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.admin-header h2 {
+  font-size: 2rem;
+  color: #1a202c;
+  margin-bottom: 0.5rem;
+}
+
+.admin-controls {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem auto;
+}
+
+.admin-button,
+.refresh-button,
+.add-testimonial-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background-color: #2d3748;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+}
+
+.admin-button:hover,
+.refresh-button:hover,
+.add-testimonial-button:hover {
+  background-color: #4a5568;
+  transform: translateY(-1px);
+}
+
+.refresh-button:disabled,
+.add-testimonial-button:disabled {
+  background-color: #cbd5e0;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.back-to-public {
+  display: flex;
+  justify-content: center;
+  margin-top: 3rem;
+  padding-bottom: 2rem;
+}
+
+.back-to-public a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  background-color: #718096;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  text-decoration: none;
+}
+
+.back-to-public a:hover {
+  background-color: #4a5568;
+  transform: translateY(-1px);
+}
+
+.testimonials-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.testimonials-list {
-  display: grid;
-  gap: 1.5rem;
-  margin-top: 2rem;
+.testimonial-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  transition: transform 0.2s ease-in-out;
 }
 
-.testimonial-card {
-  background-color: #ffffff;
-  border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.testimonial-card:hover {
+  transform: translateY(-5px);
+}
+
+.testimonial-content {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.testimonial-content {
-  flex: 1;
+.testimonial-header {
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
-.testimonial-author {
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+.testimonial-meta strong {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.testimonial-meta span {
+  display: block;
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0.25rem 0 0 0;
+}
+
+.testimonial-rating {
+  color: #ffd700;
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.testimonial-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #444;
+  margin: 0;
 }
 
 .testimonial-status {
-  margin-top: 0.5rem;
   font-size: 0.9rem;
   color: #666;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+  margin-top: 1rem;
 }
 
 .testimonial-actions {
   display: flex;
   gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
 }
 
 .approve-btn,
-.discard-btn {
-  padding: 0.5rem 1rem;
+.reject-btn {
+  flex: 1;
+  padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
+  border-radius: 5px;
+  font-size: 1rem;
   font-weight: 500;
-  transition: background-color 0.2s;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
 }
 
 .approve-btn {
-  background-color: #4CAF50;
+  background-color: #28a745;
   color: white;
 }
 
 .approve-btn:hover {
-  background-color: #45a049;
+  background-color: #218838;
 }
 
-.discard-btn {
-  background-color: #f44336;
+.reject-btn {
+  background-color: #dc3545;
   color: white;
 }
 
-.discard-btn:hover {
-  background-color: #da190b;
+.reject-btn:hover {
+  background-color: #c82333;
+}
+
+.approve-btn:disabled,
+.reject-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: rgb(107, 114, 128);
+  font-size: 1.125rem;
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1rem;
+  text-align: center;
+  z-index: 1000;
+  color: rgb(107, 114, 128);
+  font-size: 1.125rem;
+  backdrop-filter: blur(4px);
+}
+
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: rgb(220, 38, 38);
+  background-color: rgb(254, 226, 226);
+  border-radius: 0.5rem;
+  margin: 2rem auto;
+  max-width: 80rem;
 } 
