@@ -6,10 +6,9 @@ import './AdminTestimonials.css';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
-const TestimonialCard = ({ testimonial, onApprove, onReject, onDelete, disabled }: {
+const TestimonialCard = ({ testimonial, onApprove, onDelete, disabled }: {
   testimonial: Testimonial;
   onApprove: (id: string) => void;
-  onReject: (id: string) => void;
   onDelete: (id: string) => void;
   disabled: boolean;
 }) => {
@@ -43,7 +42,7 @@ const TestimonialCard = ({ testimonial, onApprove, onReject, onDelete, disabled 
               </button>
               <button
                 className="reject-btn"
-                onClick={() => onReject(testimonial.testimonialId)}
+                onClick={() => onDelete(testimonial.testimonialId)}
                 disabled={disabled}
               >
                 {t('Reject')}
@@ -74,7 +73,7 @@ const AdminTestimonials = () => {
   const operationInProgressRef = useRef(false);
 
   const fetchTestimonials = useCallback(async () => {
-    if (operationInProgressRef.current && loading) return; // Prevent re-entry if already fetching/operating
+    if (operationInProgressRef.current && loading) return;
     
     operationInProgressRef.current = true;
     setLoading(true);
@@ -89,7 +88,7 @@ const AdminTestimonials = () => {
       setLoading(false);
       operationInProgressRef.current = false;
     }
-  }, [t, loading]); // Added loading to useCallback dependencies
+  }, [t, loading]);
 
   useEffect(() => {
     if (!initialFetchDoneRef.current) {
@@ -115,35 +114,13 @@ const AdminTestimonials = () => {
     } finally {
       setLoading(false);
       operationInProgressRef.current = false;
-      fetchTestimonials(); // Re-fetch for consistency
-    }
-  };
-
-  const handleReject = async (id: string) => {
-    if (operationInProgressRef.current) return;
-    
-    operationInProgressRef.current = true;
-    setLoading(true);
-    try {
-      const updatedTestimonial = await testimonialServiceRef.current.rejectTestimonial(id);
-      setTestimonials(prev => 
-        prev.map(t => t.testimonialId === id ? updatedTestimonial : t)
-      );
-      setError(null);
-    } catch (err) {
-      console.error("Error rejecting testimonial:", err);
-      setError(t('Failed to reject testimonial'));
-    } finally {
-      setLoading(false);
-      operationInProgressRef.current = false;
-      fetchTestimonials(); // Re-fetch for consistency
+      fetchTestimonials();
     }
   };
 
   const handleDelete = async (id: string) => {
     if (operationInProgressRef.current) return;
 
-    // eslint-disable-next-line no-alert
     if (window.confirm(t('Are you sure you want to delete this testimonial?'))) {
       operationInProgressRef.current = true;
       setLoading(true);
@@ -157,12 +134,12 @@ const AdminTestimonials = () => {
       } finally {
         setLoading(false);
         operationInProgressRef.current = false;
-        fetchTestimonials(); // Re-fetch for consistency
+        fetchTestimonials();
       }
     }
   };
 
-  if (loading && testimonials.length === 0 && initialFetchDoneRef.current) { // Adjusted loading condition
+  if (loading && testimonials.length === 0 && initialFetchDoneRef.current) {
     return <div className="loading">{t('Loading testimonials...')}</div>;
   }
 
@@ -178,14 +155,14 @@ const AdminTestimonials = () => {
       <div className="admin-controls">
         <button 
           className="refresh-button"
-          onClick={fetchTestimonials} // Keep this direct call
-          disabled={loading} // Disable if loading (which operationInProgressRef also implies via fetchTestimonials)
+          onClick={fetchTestimonials}
+          disabled={loading}
         >
           {t('Refresh Testimonials')}
         </button>
         <button 
           className="add-testimonial-button"
-          disabled={loading} // Disable if loading
+          disabled={loading}
         >
           {t('Add Testimonial')}
         </button>
@@ -197,9 +174,8 @@ const AdminTestimonials = () => {
             key={testimonial.testimonialId}
             testimonial={testimonial}
             onApprove={handleApprove}
-            onReject={handleReject}
             onDelete={handleDelete}
-            disabled={loading} // Disable card buttons if loading
+            disabled={loading}
           />
         ))}
       </div>
