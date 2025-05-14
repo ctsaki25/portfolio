@@ -5,6 +5,7 @@ import com.portfolio.portfolio_backend.logiclayer.testimonials.TestimonialServic
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,5 +51,12 @@ public class TestimonialController {
     @PutMapping("/{testimonialId}/reject")
     public Mono<TestimonialResponseModel> rejectTestimonial(@PathVariable String testimonialId) {
         return testimonialService.updateApprovalStatus(testimonialId, false);
+    }
+
+    @DeleteMapping("/{testimonialId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<Void> deleteTestimonial(@PathVariable String testimonialId) {
+        log.info("Received request to delete project with ID: {}", testimonialId);
+        return testimonialService.deleteTestimonial(testimonialId);
     }
 } 

@@ -10,5 +10,6 @@ public interface TestimonialService {
     Flux<TestimonialResponseModel> getAllTestimonials();
     Flux<TestimonialResponseModel> getApprovedTestimonials();
     Mono<TestimonialResponseModel> createTestimonial(TestimonialRequestModel requestModel);
-    Mono<TestimonialResponseModel> updateApprovalStatus(String testimonialId, boolean approved);
+    Mono<TestimonialResponseModel> updateApprovalStatus(String testimonialId, boolean approved);    
+    Mono<Void> deleteTestimonial(String testimonialId);
 } 

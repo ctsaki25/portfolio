@@ -63,4 +63,17 @@ public class TestimonialServiceImpl implements TestimonialService {
                 .flatMap(testimonialRepository::save)
                 .map(TestimonialResponseModel::from);
     }
+
+    @Override
+    public Mono<Void> deleteTestimonial(String testimonialId) {
+        log.info("Deleting testimonial with ID: {}", testimonialId);
+        return testimonialRepository.findByTestimonialId(testimonialId)
+                .switchIfEmpty(Mono.error(new NotFoundException("Testimonial not found with id: " + testimonialId)))
+                .flatMap(testimonial -> {
+                    log.info("Found testimonial with ID: {}. Deleting now.", testimonialId);
+                    return testimonialRepository.delete(testimonial);
+                })
+                .doOnSuccess(v -> log.info("Successfully deleted testimonial with ID: {}", testimonialId))
+                .doOnError(error -> log.error("Error deleting testimonial with ID: {}: {}", testimonialId, error.getMessage()));
+    }
 } 

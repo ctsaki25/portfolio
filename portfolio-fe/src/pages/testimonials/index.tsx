@@ -112,7 +112,6 @@ const useTestimonials = () => {
 
         loadTestimonials();
 
-        // Cleanup function to prevent state updates if component unmounts
         return () => {
             mounted = false;
         };
@@ -155,7 +154,6 @@ const Testimonials = () => {
 
     return (
         <div className={styles.container}>
-            {/* Hero Section */}
             <div className="hero">
                 <div className="heroContainer">
                     <div className="heroContent">
@@ -172,7 +170,6 @@ const Testimonials = () => {
                 </div>
             </div>
 
-            {/* Testimonials Section */}
             <div className={styles.testimonialsSection}>
                 <div className={styles.controls}>
                     <button 
@@ -204,7 +201,6 @@ const Testimonials = () => {
                     ))}
                 </div>
 
-                {/* Admin Controls - Moved to bottom */}
                 {isAuthenticated && (
                     <div className={styles.adminControls}>
                         <Link 
