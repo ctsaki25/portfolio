@@ -11,10 +11,12 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 
 @Slf4j
+@Component
 public class JwtAuthenticationFilter implements WebFilter {
     private final JwtUtil jwtUtil;
 

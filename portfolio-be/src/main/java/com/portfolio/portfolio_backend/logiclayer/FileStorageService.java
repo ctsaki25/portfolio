@@ -19,45 +19,64 @@ import java.util.UUID;
 @Service
 public class FileStorageService {
     private final Path fileStorageLocation;
-    private final String baseUrl;
 
-    public FileStorageService(
-            @Value("${file.upload-dir}") String uploadDir,
-            @Value("${app.base-url}") String baseUrl) {
+    public FileStorageService(@Value("${file.upload-dir}") String uploadDir) {
         this.fileStorageLocation = Paths.get(uploadDir).toAbsolutePath().normalize();
-        this.baseUrl = baseUrl;
-
         try {
             Files.createDirectories(this.fileStorageLocation);
+            log.info("File storage location initialized at: {}", this.fileStorageLocation);
         } catch (IOException ex) {
+            log.error("Could not create the directory for uploads: {}", this.fileStorageLocation, ex);
             throw new RuntimeException("Could not create the directory where the uploaded files will be stored.", ex);
         }
     }
 
+    /**
+     * Stores a file with a unique name directly in the fileStorageLocation.
+     * @param filePart The file part to store.
+     * @return A Mono containing the unique name of the stored file (e.g., "unique_filename.ext").
+     */
     public Mono<String> storeFile(FilePart filePart) {
-        // Generate unique filename
-        String fileName = UUID.randomUUID().toString() + "_" + filePart.filename();
-        Path targetLocation = this.fileStorageLocation.resolve(fileName);
+        String originalFileName = filePart.filename();
+        String fileExtension = "";
+        int lastDot = originalFileName.lastIndexOf('.');
+        if (lastDot > 0 && lastDot < originalFileName.length() - 1) {
+            fileExtension = originalFileName.substring(lastDot);
+        }
+        String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
+        
+        Path targetLocation = this.fileStorageLocation.resolve(uniqueFileName).normalize();
 
-        log.info("Storing file: {} at location: {}", fileName, targetLocation);
+        log.info("Attempting to store file: {} (original: {}) at: {}", uniqueFileName, originalFileName, targetLocation);
 
         return filePart.transferTo(targetLocation)
-                .then(Mono.just(baseUrl + "/api/v1/projects/images/" + fileName))
-                .doOnSuccess(url -> log.info("Successfully stored file. URL: {}", url));
+                .then(Mono.just(uniqueFileName))
+                .doOnSuccess(fileName -> log.info("Successfully stored file. Filename: {}", fileName))
+                .doOnError(e -> log.error("Failed to store file {} at {}: {}", uniqueFileName, targetLocation, e.getMessage()));
     }
 
-    public Mono<Resource> loadFileAsResource(String fileName) {
+    /**
+     * Loads a file as a resource from the fileStorageLocation.
+     * @param filename The name of the file (e.g., "filename.ext").
+     * @return A Mono containing the resource, or an error if not found.
+     */
+    public Mono<Resource> loadFileAsResource(String filename) {
         try {
-            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+            Path filePath = this.fileStorageLocation.resolve(filename).normalize();
             Resource resource = new UrlResource(filePath.toUri());
 
-            if(resource.exists()) {
+            if (resource.exists() && resource.isReadable()) {
                 return Mono.just(resource);
             } else {
-                return Mono.error(new RuntimeException("File not found: " + fileName));
+                log.warn("File not found or not readable: {}", filename);
+                return Mono.error(new RuntimeException("File not found: " + filename));
             }
         } catch (MalformedURLException ex) {
-            return Mono.error(new RuntimeException("File not found: " + fileName, ex));
+            log.error("Malformed URL for path: {}", filename, ex);
+            return Mono.error(new RuntimeException("File not found (malformed URL): " + filename, ex));
+        } catch (Exception ex) {
+            log.error("Error loading file as resource: {}", filename, ex);
+            return Mono.error(new RuntimeException("Could not load file: " + filename, ex));
         }
     }
 }
