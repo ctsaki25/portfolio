@@ -50,13 +50,8 @@ export const useTestimonialService = () => {
     };
 
     const rejectTestimonial = async (testimonialId: string): Promise<Testimonial> => {
-        try {
-            const response = await axiosInstance.put<Testimonial>(`/testimonials/${testimonialId}/reject`);
-            return response.data;
-        } catch (error) {
-            console.error('Error rejecting testimonial:', error);
-            throw error;
-        }
+        const response = await axiosInstance.put<Testimonial>(`/testimonials/${testimonialId}/reject`);
+        return response.data;
     };
 
     const deleteTestimonial = async (testimonialId: string): Promise<void> => {
