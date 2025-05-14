@@ -3,7 +3,6 @@ import ProtectedRoute from '../components/auth/ProtectedRoute';
 import Login from '../components/auth/Login';
 import AdminProjects from '../components/admin/AdminProjects';
 import AdminTestimonials from '../components/admin/AdminTestimonials';
-import AdminSkills from '../components/admin/AdminSkills';
 import Home from '../pages/home';
 import Projects from '../components/projects/Projects';
 import Testimonials from '../pages/testimonials';
@@ -35,14 +34,6 @@ const Router = () => {
         element={
           <ProtectedRoute>
             <AdminTestimonials />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/skills"
-        element={
-          <ProtectedRoute>
-            <AdminSkills />
           </ProtectedRoute>
         }
       />
