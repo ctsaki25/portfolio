@@ -16,7 +16,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendEmail(EmailRequestModel emailRequest) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(emailRequest.getEmail());
-        message.setTo("ctsaki25@gmail.com"); // Replace with your email
+        message.setTo("ctsaki25@gmail.com"); 
         message.setSubject("Portfolio Contact: " + emailRequest.getSubject());
         message.setText(
             "Name: " + emailRequest.getName() + "\n" +

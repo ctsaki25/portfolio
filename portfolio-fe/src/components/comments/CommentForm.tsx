@@ -20,7 +20,6 @@ const CommentForm = ({ projectId, onCommentAdded }: CommentFormProps) => {
     e.preventDefault();
     
     try {
-      // Implement your own authentication/authorization here if needed
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/v1/projects/${projectId}/comments`,
         {
