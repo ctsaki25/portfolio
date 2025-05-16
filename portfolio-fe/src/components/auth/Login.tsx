@@ -21,9 +21,20 @@ const Login = () => {
     }
   };
 
+  const handleClose = () => {
+    navigate(-1); // Navigate back to previous page
+  };
+
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
+        <button 
+          className={styles.closeButton} 
+          onClick={handleClose}
+          aria-label="Close"
+        >
+          &times;
+        </button>
         <form onSubmit={handleSubmit} className={styles.loginForm}>
           <h2>Admin Login</h2>
           {error && <div className={styles.error}>{error}</div>}
