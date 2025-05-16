@@ -1,6 +1,9 @@
 import { useTranslation } from "react-i18next";
 import styles from './Skills.module.css';
 import { Award, Code, Wrench, Languages } from 'lucide-react';
+import { API_URL } from '../../config/api';
+
+const BACKEND_URL = API_URL;
 
 interface SkillCategory {
   category: string;
@@ -79,6 +82,13 @@ const Skills = () => {
               <p className={styles.heroDescription}>
                 {t("Technical Overview")}
               </p>
+            </div>
+            <div className="heroImageContainer">
+              <img 
+                src={`${BACKEND_URL}/api/images/profile.webp`}
+                alt={t("Constantine Tsakiris")}
+                className="profileImage"
+              />
             </div>
           </div>
         </div>

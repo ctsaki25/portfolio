@@ -43,6 +43,24 @@
   max-width: 100%;
 }
 
+/* Add styles for the profile image */
+.heroImageContainer {
+  flex-shrink: 0;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  margin-top: 2rem;
+}
+
+.profileImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid rgb(37, 99, 235);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
 @media (min-width: 640px) {
   .heroContent {
     padding: 4rem 1.5rem;
@@ -68,5 +86,18 @@
   .heroDescription {
     margin-left: 0;
     margin-right: 0;
+  }
+
+  .heroContent {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+  
+  .heroImageContainer {
+    width: 300px;
+    height: 300px;
+    margin: 0;
   }
 } 

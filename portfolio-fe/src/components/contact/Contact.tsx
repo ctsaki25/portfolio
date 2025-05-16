@@ -1,7 +1,7 @@
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './contact.module.css';
-import { API_URL_V1 } from '../../config/api';
+import { API_URL_V1, API_URL } from '../../config/api';
 
 interface FormData {
   name: string;
@@ -9,6 +9,8 @@ interface FormData {
   subject: string;
   message: string;
 }
+
+const BACKEND_URL = API_URL;
 
 const Contact = () => {
   const { t } = useTranslation();
@@ -20,6 +22,7 @@ const Contact = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitStatus, setSubmitStatus] = useState<'success' | 'error' | ''>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -33,18 +36,25 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus('');
+    setErrorMessage('');
 
     try {
+      console.log('Sending email to:', `${API_URL_V1}/email/send`);
       const response = await fetch(`${API_URL_V1}/email/send`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
+        // Add a timeout to the fetch request
+        signal: AbortSignal.timeout(15000) // 15 seconds timeout
       });
 
+      const responseText = await response.text();
+      console.log('Response from server:', responseText);
+
       if (!response.ok) {
-        throw new Error('Failed to send email');
+        throw new Error(`Server error: ${response.status} - ${responseText}`);
       }
 
       setSubmitStatus('success');
@@ -57,6 +67,13 @@ const Contact = () => {
     } catch (error) {
       console.error('Error sending email:', error);
       setSubmitStatus('error');
+      if (error instanceof Error) {
+        setErrorMessage(error.message.includes('AbortError') 
+          ? 'Request timed out. The server may be temporarily unavailable.' 
+          : error.message);
+      } else {
+        setErrorMessage('An unexpected error occurred');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -89,6 +106,13 @@ const Contact = () => {
                   </a>
                 </div>
               </div>
+            </div>
+            <div className={styles.heroImageContainer}>
+              <img 
+                src={`${BACKEND_URL}/api/images/profile.webp`}
+                alt={t("Constantine Tsakiris")}
+                className={styles.profileImage}
+              />
             </div>
           </div>
         </div>
@@ -169,13 +193,13 @@ const Contact = () => {
 
               {submitStatus === 'success' && (
                 <div className={styles.success}>
-                  {t("Message sent successfully!")}
+                  {t("Message sent successfully! I'll get back to you soon.")}
                 </div>
               )}
               
               {submitStatus === 'error' && (
                 <div className={styles.error}>
-                  {t("Failed to send message. Please try again.")}
+                  {errorMessage || t("Failed to send message. Please try again or contact me directly at ctsaki25@gmail.com.")}
                 </div>
               )}
             </div>

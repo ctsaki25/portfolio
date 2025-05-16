@@ -117,6 +117,13 @@ const Projects = () => {
                 {t('Explore my collection of projects showcasing my expertise in full-stack development, game development, and modern web applications.')}
               </p>
             </div>
+            <div className="heroImageContainer">
+              <img 
+                src={`${BACKEND_URL}/api/images/profile.webp`}
+                alt={t("Constantine Tsakiris")}
+                className="profileImage"
+              />
+            </div>
           </div>
         </div>
       </div>

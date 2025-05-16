@@ -7,7 +7,6 @@ import { API_URL } from '../../config/api';
 
 const BACKEND_URL = API_URL; 
 
-// Properly type the ProjectCard component
 const ProjectCard = ({ project }: { project: Project }) => {
   const { t } = useTranslation();
   

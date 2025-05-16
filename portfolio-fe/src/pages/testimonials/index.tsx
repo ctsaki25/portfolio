@@ -6,6 +6,9 @@ import styles from './Testimonials.module.css';
 import '@/styles/hero.css';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
+import { API_URL } from '../../config/api';
+
+const BACKEND_URL = API_URL;
 
 const TestimonialForm = ({ onSubmit }: { onSubmit: (testimonial: { name: string, title: string, content: string, stars: number }) => void }) => {
     const { t } = useTranslation();
@@ -165,6 +168,13 @@ const Testimonials = () => {
                             <p className="heroDescription">
                                 {t('Read what clients and colleagues have to say about their experiences working with me.')}
                             </p>
+                        </div>
+                        <div className="heroImageContainer">
+                            <img 
+                                src={`${BACKEND_URL}/api/images/profile.webp`}
+                                alt={t("Constantine Tsakiris")}
+                                className="profileImage"
+                            />
                         </div>
                     </div>
                 </div>
